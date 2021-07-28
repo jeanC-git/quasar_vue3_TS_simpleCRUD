@@ -1,8 +1,43 @@
 <template>
-  <q-dialog ref='dialog'>
+  <q-dialog ref='dialog' v-model='props.modalOpen' persistent>
     <q-card class='q-dialog-plugin'>
       <q-card-section>
-        <h1>FormUser</h1>
+        <div class="text-h6">{{props.title}}</div>
+      </q-card-section>
+      <q-card-section>
+
+        <q-form ref='userForm' class='q-gutter-md'>
+          <q-input
+            filled
+            v-model='props.user.firstname'
+            label='Nombre'
+            :rules="[ val => val && val.length > 0 || 'Campo requerido']"
+          />
+          <q-input
+            filled
+            v-model='props.user.fathers_lastname'
+            label='Apellido Materno'
+            :rules="[ val => val && val.length > 0 || 'Campo requerido']"
+          />
+          <q-input
+            filled
+            v-model='props.user.mothers_lastname'
+            label='Apellido Paterno'
+            :rules="[ val => val && val.length > 0 || 'Campo requerido']"
+          />
+          <q-input
+            filled
+            v-model='props.user.email'
+            label='Correo electrónico'
+            :rules="[ val => val && val.length > 0 || 'Campo requerido']"
+          />
+          <q-input
+            filled
+            v-model='props.user.dni'
+            label='DNI'
+            :rules="[ val => val && val.length > 0 || 'Campo requerido']"
+          />
+        </q-form>
       </q-card-section>
       <q-card-actions align='right'>
         <q-btn color='primary' label='OK' @click='confirm' />
@@ -14,38 +49,46 @@
 
 <script>
 import { defineComponent, ref } from 'vue';
-import { User } from 'src/models/User';
 
 export default defineComponent({
   name: 'ModalUser',
   props: {
+    title: {
+      type: String,
+      required: true
+    },
     user: {
       type: Object,
-      required:true,
+      required: true
     },
     modalOpen: {
       type: Boolean,
       required: true
     }
   },
-  setup({user, modalOpen}, {emit}) {
+  setup: function(props, { emit }) {
+    const userForm = ref(null);
 
     function confirm() {
-      emit('onConfirm');
+      userForm.value.validate().then(success => {
+        if (success) {
+          console.log('form OK');
+          emit('onConfirm');
+        } else {
+          console.log('form con errores');
+        }
+      });
     }
 
     function cancel() {
-      emit('onCancel')
-    }
-
-    function close() {
-      emit('onClose')
+      emit('onCancel');
     }
 
     return {
+      props,
       confirm,
       cancel,
-      close
+      userForm,
     };
   }
 });
