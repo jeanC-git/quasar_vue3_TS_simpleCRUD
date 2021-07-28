@@ -16,13 +16,13 @@
           <q-input
             filled
             v-model='props.user.fathers_lastname'
-            label='Apellido Materno'
+            label='Apellido Paterno'
             :rules="[ val => val && val.length > 0 || 'Campo requerido']"
           />
           <q-input
             filled
             v-model='props.user.mothers_lastname'
-            label='Apellido Paterno'
+            label='Apellido Materno'
             :rules="[ val => val && val.length > 0 || 'Campo requerido']"
           />
           <q-input

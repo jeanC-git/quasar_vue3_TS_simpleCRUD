@@ -178,9 +178,8 @@ export default defineComponent({
             console.log(err);
           });
       }
+      currentPage.value = 1
       getData('user/get-all');
-
-
     }
 
     function cancelModalUser() {
