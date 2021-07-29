@@ -13,7 +13,7 @@
         hide-pagination
       >
         <template v-slot:top>
-          <q-btn class='q-ml-sm' color='primary' label='Refresh data' @click="getData('user/get-all')" />
+          <q-btn class='q-ml-sm' color='primary' label='Refresh data' @click='refreshData' />
           <q-btn class='q-ml-sm' color='primary' label='Crear usuario' @click='createUser' />
 
         </template>
@@ -24,11 +24,11 @@
           </q-td>
         </template>
       </q-table>
-      <div class="row justify-center q-mt-md">
+      <div class='row justify-center q-mt-md'>
         <q-pagination
-          v-model="currentPage"
-          color="grey-8"
-          :max="pagination.maxPage"
+          v-model='currentPage'
+          color='grey-8'
+          :max='pagination.maxPage'
         />
       </div>
     </div>
@@ -49,7 +49,7 @@ import { defineComponent, ref, onMounted, reactive, watch } from 'vue';
 import { User } from 'src/models/User';
 import ModalUser from '../components/ModalUser.vue';
 import { api } from 'boot/axios';
-import  { useQuasar} from 'quasar';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'PageIndex',
@@ -67,7 +67,6 @@ export default defineComponent({
       dni: '',
       email: ''
     });
-    let refModalUser = ref(null);
     let loading = ref(false);
     let pagination = reactive({
       rowsPerPage: 2,
@@ -97,23 +96,27 @@ export default defineComponent({
       { name: 'email', label: 'Correo Electrónico', field: 'email', align: 'left', sortable: true },
       { name: 'actions', label: 'Acciones', field: 'actions', sortable: true, align: 'center' }
     ];
-    const $q = useQuasar()
+    const refModalUser = ref(null);
 
+    const $q = useQuasar();
 
     watch(currentPage, (next) => {
       getData('user/get-all', Number(next));
     });
 
+    function refreshData() {
+      refModalUser.value.consoleLog();
+      getData('user/get-all');
+    }
+
     function getData(endpoint: string, page = 1) {
       loading.value = true;
-      console.log('cargando datos ...');
       const url = `${endpoint}?page=${page}`;
       api.get(url)
         .then(res => {
           let data = res.data.data.data;
           pagination.maxPage = res.data.data.last_page;
           rows.value = data;
-          console.log('datos cargados!');
           setTimeout(() => {
             loading.value = false;
           }, 1000);
@@ -125,7 +128,6 @@ export default defineComponent({
 
     function createUser() {
       modalUserTitle.value = 'Crear Usuario';
-      console.log('createUSer');
       modalUser.value = true;
     }
 
@@ -141,44 +143,44 @@ export default defineComponent({
       modalUser.value = true;
     }
 
-    function deleteUser(user:User) {
-        $q.dialog({
-          title: 'Eliminar Usuario',
-          message: '¿Está seguro de eliminar este usuario?',
-          cancel: true,
-          persistent: true
-        }).onOk(async () => {
-          await api.delete(`user/delete-user/${user.id}`)
-            .then(() => {
-              getData('user/get-all');
-            })
-            .catch(err => {
-              console.log(err);
-            });
-        })
+    function deleteUser(user: User) {
+      $q.dialog({
+        title: 'Eliminar Usuario',
+        message: '¿Está seguro de eliminar este usuario?',
+        cancel: true,
+        persistent: true
+      }).onOk(async () => {
+        await api.delete(`user/delete-user/${user.id}`)
+          .then(() => {
+            getData('user/get-all');
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      });
     }
 
     async function confirmModalUser() {
       modalUser.value = false;
-      const data = userTemp.value
+      const data = userTemp.value;
       if (data.id === 0) {
-        await api.post('user/create-user',data)
+        await api.post('user/create-user', data)
           .then((res) => {
-            console.log(res.data);
+            // console.log(res.data);
           })
           .catch(err => {
             console.log(err);
           });
       } else {
-        await api.put('user/edit-user',data)
+        await api.put('user/edit-user', data)
           .then((res) => {
-            console.log(res.data);
+            // console.log(res.data);
           })
           .catch(err => {
             console.log(err);
           });
       }
-      currentPage.value = 1
+      currentPage.value = 1;
       getData('user/get-all');
     }
 
@@ -205,6 +207,7 @@ export default defineComponent({
       deleteUser,
       confirmModalUser,
       cancelModalUser,
+      refreshData,
       refModalUser,
       ModalUser,
       modalUser,

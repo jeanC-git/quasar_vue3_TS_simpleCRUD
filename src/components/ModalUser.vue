@@ -47,7 +47,7 @@
   </q-dialog>
 </template>
 
-<script>
+<script lang='ts'>
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
@@ -84,11 +84,16 @@ export default defineComponent({
       emit('onCancel');
     }
 
+    function consoleLog() {
+      console.log('funcion llamada desde el parent');
+    }
+
     return {
       props,
       confirm,
       cancel,
       userForm,
+      consoleLog
     };
   }
 });
